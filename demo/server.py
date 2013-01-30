@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 from flask import Flask
-from lorna import LornaView
+import lorna
 
-class ArticlesView(LornaView): pass
+class ArticlesView(lorna.LornaView): pass
 
 
 app = Flask(__name__)
