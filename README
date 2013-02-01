@@ -1,9 +1,0 @@
-###Lorna - An easily configured RESTful MongoDB server built on Flask and Flask-Classy
-
-This is a very early version of Lorna which needs at least the following work before thinking about.
-
-####TODO
-
-* Write some docs?
-* Provide a decent demo app for the docs.
-* Change the DB naming mechanism to be in the class definition.
