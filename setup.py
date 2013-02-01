@@ -1,14 +1,14 @@
 from setuptools import setup
 
-setup(name='Lorna',
+setup(name='Lazy',
     version='0.1',
-    description='Lorna Restful MongoDB Server',
+    description='Lazy Restful MongoDB Server',
     author='Col Wilson',
     author_email='colwilson@bcs.org',
-    packages=['lorna'],
+    packages=['lazy'],
     include_package_data=True,
     zip_safe=False,
-    test_suite = "lorna.testsuite.rest_tests",
+    test_suite = "lazy.tests.rest_tests",
     install_requires=[
         "Flask==0.9",
         "Flask-Classy==0.5.2",

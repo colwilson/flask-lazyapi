@@ -9,15 +9,17 @@ from pymongo import MongoClient
 #from nose.tools import set_trace; set_trace()
 
 
-class LornaView(FlaskView):
-
+class API(FlaskView):
 
     def _rsrc_url(self, id):
         return request.url_root[:-1] + url_for(request.endpoint) + str(id)
 
     def collection(self):
         connection = MongoClient()
-        db = connection[self.get_route_base()+'db']
+        try:
+            db = connection[self.db]
+        except:
+            db = connection[self.get_route_base()+'db']
         collection = db[self.get_route_base()]
         return collection   
     

@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
-import lorna
+import lazy
 from flask import Flask
 import unittest
 from urlparse import urlparse
 from pymongo import MongoClient
 from bson.json_util import dumps, loads, ObjectId
 
-ENTITY = 'tests'
+ENTITY = 'penguins'
 HOME = '/' + ENTITY + '/'
 DB = ENTITY + 'db'
 
-class TestsView(lorna.LornaView): pass
+class Penguins(lazy.API): pass
 
-class LornaTestCase(unittest.TestCase):
+class RestTestCase(unittest.TestCase):
 
     dummy1 = dict(title="title1", text="text1")
     dummy2 = dict(title="title2", text="text2")
@@ -24,7 +24,7 @@ class LornaTestCase(unittest.TestCase):
     def setUp(self):
         app = Flask(__name__)
         app.config['TESTING'] = True
-        TestsView.register(app)
+        Penguins.register(app)
         self.app = app.test_client()
         #print app.url_map
         
@@ -39,6 +39,8 @@ class LornaTestCase(unittest.TestCase):
         
     def tearDown(self):
         self.collection.remove()
+        self.connection.drop_database(DB)
+        
         
     def do_get_first_doc(self):
         rv = self.app.get(HOME)
