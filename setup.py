@@ -8,7 +8,7 @@ setup(name='Lazy',
     packages=['lazy'],
     include_package_data=True,
     zip_safe=False,
-    test_suite = "lazy.tests.rest_tests",
+    test_suite = "lazy.tests",
     install_requires=[
         "Flask==0.9",
         "Flask-Classy==0.5.2",

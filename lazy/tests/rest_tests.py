@@ -38,7 +38,6 @@ class RestTestCase(unittest.TestCase):
         self.collection.insert(self.dummy3)
         
     def tearDown(self):
-        self.collection.remove()
         self.connection.drop_database(DB)
         
         
