@@ -117,7 +117,7 @@ class RestTestCase(unittest.TestCase):
         doc['text'] = 'changed text'
         
         # save the modified doc
-        rv = self.app.put(url.path, data=dumps(doc))
+        rv = self.app.put(url.path, data=dumps(doc))        
             
         # check the result is identical
         d = loads(rv.data)
@@ -145,7 +145,7 @@ class RestTestCase(unittest.TestCase):
 
         # put docs
         rv = self.app.put(HOME, data=dumps(d))
-        assert(rv.status_code == 201)
+        assert(rv.status_code == 200)
 
         # count docs
         rv = self.app.get(HOME)

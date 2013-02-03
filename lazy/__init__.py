@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import request, url_for
+from flask import request, url_for, make_response
 from flask.ext.classy import FlaskView, route
 from bson.json_util import dumps, loads, ObjectId
 from bson.errors import InvalidId
@@ -97,7 +97,7 @@ class API(FlaskView):
             # add new docs
             ids = self.collection().insert(docs)
             if len(ids):
-                return ('collection replace ok', 201, {'Content-Location': request.url})
+                return ('collection replace ok', 200, {'Content-Location': request.url})
             else:
                 return ('data was not updated', 400, None)
         except Exception, e:      
@@ -106,21 +106,25 @@ class API(FlaskView):
     @route('/<id>', methods=['PUT'])
     def put_id(self, id):
         payload = request.data
-
+        
         try:
             assert(isinstance(payload, basestring))
             doc = loads(payload)
-
+            assert('_id' in doc)
+            assert(str(doc['_id']) == id)
+            doc['_id'] == id
+            
             id0 = self.collection().save(doc)
+            
             if id0:
                 if (id0 == ObjectId(id)):
-                    return (dumps(doc), 201, {'Content-Location': request.url})
+                    return (dumps(doc), 200, {'Content-Location': request.url})
                 else:
-                    return ('ids do not match', 400, None)
+                    return ('ids do not match', 405, None)
             else:
-                return ('data was not updated', 400, None)
+                return ('data was not updated', 500, None)
         except Exception, e:
-            return (str(e), 400, None)
+            return (str(e), 500, None)
 
 
 
