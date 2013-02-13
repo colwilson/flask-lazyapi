@@ -77,7 +77,7 @@ will use a db called 'mydb'.
 
 If you want to version your interface you can use the normal Blueprint mechanism
 
-#!/usr/bin/env python
+    #!/usr/bin/env python
 
     from flask import Flask, Blueprint
     import lazy
