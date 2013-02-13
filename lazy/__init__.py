@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import request, url_for, make_response
+from flask import request, url_for, make_response, current_app
 from flask.ext.classy import FlaskView, route
 from bson.json_util import dumps, loads, ObjectId
 from bson.errors import InvalidId
@@ -20,6 +20,7 @@ class API(FlaskView):
             db = connection[self.db]
         except:
             db = connection[self.get_route_base()+'db']
+            
         collection = db[self.get_route_base()]
         return collection   
     
@@ -28,6 +29,7 @@ class API(FlaskView):
         urls = [ self._rsrc_url(doc['_id']) for doc in docs ]
         return (dumps({self.get_route_base(): urls}), 200, None)
 
+            
     def get(self, id):
         try:
             doc = self.collection().find_one(ObjectId(id))

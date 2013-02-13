@@ -153,5 +153,3 @@ class RestTestCase(unittest.TestCase):
         l = d[ENTITY]
         assert(len(l) == 4)    
 
-if __name__ == '__main__':
-    unittest.main()

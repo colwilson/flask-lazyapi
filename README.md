@@ -73,3 +73,26 @@ will use a db called 'answersdb', but you specify that if you want
     class Answers(lazy.API): db = 'mydb'
 
 will use a db called 'mydb'.
+
+
+If you want to version your interface you can use the normal Blueprint mechanism
+
+#!/usr/bin/env python
+
+    from flask import Flask, Blueprint
+    import lazy
+
+    class Answers(lazy.API): pass
+
+    app = Flask(__name__)
+
+    version = "v1.0"
+    bp = Blueprint(version, __name__)
+    Answers.register(app)
+    app.register_blueprint(bp, url_prefix="/%s" % version)
+
+    if __name__ == '__main__':
+        app.run(debug=True)
+
+
+
