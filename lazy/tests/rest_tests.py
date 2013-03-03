@@ -1,155 +1,128 @@
 #!/usr/bin/env python
 
-import lazy
-from flask import Flask
-import unittest
 from urlparse import urlparse
-from pymongo import MongoClient
-from bson.json_util import dumps, loads, ObjectId
+from bson.json_util import dumps, loads
+from base import LazyBaseTestCase, ENTITY
 
-ENTITY = 'penguins'
-HOME = '/' + ENTITY + '/'
-DB = ENTITY + 'db'
+ROOT = '/' + ENTITY + '/'
 
-class Penguins(lazy.API): pass
+dummy1 = dict(title="title1", text="text1")
+dummy2 = dict(title="title2", text="text2")
+dummy3 = dict(title="title3", text="text3")
+dummy4 = dict(title="title4", text="text4")
 
-class RestTestCase(unittest.TestCase):
-
-    dummy1 = dict(title="title1", text="text1")
-    dummy2 = dict(title="title2", text="text2")
-    dummy3 = dict(title="title3", text="text3")
-    dummy4 = dict(title="title4", text="text4")
-    
-    
-    def setUp(self):
-        app = Flask(__name__)
-        app.config['TESTING'] = True
-        Penguins.register(app)
-        self.app = app.test_client()
-        #print app.url_map
-        
-        self.connection = MongoClient()
-        self.db = self.connection[DB]
-        self.collection = self.db[ENTITY]
-        self.collection.remove()
-
-        self.collection.insert(self.dummy1)
-        self.collection.insert(self.dummy2)
-        self.collection.insert(self.dummy3)
-        
-    def tearDown(self):
-        self.connection.drop_database(DB)
-        
-        
-    def do_get_first_doc(self):
-        rv = self.app.get(HOME)
-        d = loads(rv.data)
-        l = d[ENTITY]
-
-        # get the first document
-        url0 = urlparse(l[0])
-        rv = self.app.get(url0.path)
-        doc0 = loads(rv.data)
-        return rv, doc0, url0
+class GetRestTestCase(LazyBaseTestCase):
 
     def test_get_collection(self):
-        rv = self.app.get(HOME)
+        self.post_data(dummy1)
+        self.post_data(dummy2)
+        self.post_data(dummy3)
+
+        rv = self.client.get(ROOT)
         d = loads(rv.data)
         l = d[ENTITY]
-        assert(len(l) == 3)
+        self.assertEquals(len(l), 3)
 
         o0 = urlparse(l[0])
         o1 = urlparse(l[1])
         o2 = urlparse(l[2])
-        assert(o0.scheme == o1.scheme == o2.scheme)
-        assert(o0.netloc == o1.netloc == o2.netloc)
-        assert(o0.params == o1.params == o2.params)
-        assert(o0.query == o1.query == o2.query)
-        assert(o0.path != o1.path != o2.path)
-        
+        self.assertEquals(o0.scheme, o1.scheme, o2.scheme)
+        self.assertEquals(o0.netloc, o1.netloc, o2.netloc)
+        self.assertEquals(o0.params, o1.params, o2.params)
+        self.assertEquals(o0.query, o1.query, o2.query)
+        self.assertNotEquals(o0.path, o1.path, o2.path)
+
     def test_get_resource(self):
-        rv0, doc0, url = self.do_get_first_doc()
-        
-        rv = self.app.get(url.path)
+        self.post_data(dummy1)
+        doc, path = self.get_first_doc()
+        rv = self.client.get(path)
         doc = loads(rv.data)
-        assert(self.dummy1 == doc)
+        del doc['_id']
+        del doc['created_at']
+        del doc['updated_at']
+        self.assertEquals(dummy1, doc)
 
-    def test_post_collection(self):
-        rv = self.app.post(HOME, data=dumps(self.dummy4))
-        d = loads(rv.data)
-        del d['_id']
-        assert(self.dummy4 == d)
-        
-    def test_post_resource(self):
-        rv0, doc0, url = self.do_get_first_doc()
-        
-        rv = self.app.post(url.path, data=dumps(self.dummy4))
-        assert(rv.status_code == 405)
-
-    def test_delete_resource(self):
-        rv = self.app.get(HOME)
-        d = loads(rv.data)
-        l = d[ENTITY]
-        
-        o0 = urlparse(l[0])
-        rv = self.app.delete(o0.path)
-        
-        rv = self.app.get(HOME)
-        d = loads(rv.data)
-        l = d[ENTITY]
-        assert(len(l) == 2)
-        
-    def test_delete_collection(self):
-        rv = self.app.delete(HOME)
-        assert(rv.status_code == 200)
-        
-        rv = self.app.get(HOME)
-        d = loads(rv.data)
-        l = d[ENTITY]
-        assert(len(l) == 0)
-        
-    def test_put_resource_results_match(self):
-
-        rv, doc, url = self.do_get_first_doc()
-
-        # alter the doc
-        doc['title'] = 'changed title'
-        doc['text'] = 'changed text'
-        
-        # save the modified doc
-        rv = self.app.put(url.path, data=dumps(doc))        
-            
-        # check the result is identical
-        d = loads(rv.data)
-        assert(d == doc)
-
-    def test_put_resource_inserted_ok(self):
+class PostRestTestCase(LazyBaseTestCase):
     
-        rv, doc, url = self.do_get_first_doc()
+    def test_post_thing(self):
+        rv = self.client.post(ROOT, data=dumps(dummy1))
+        self.assertEquals(rv.status_code, 201)
+        
+    def test_post_resource_fails(self):
+        rv = self.client.post('/' + ENTITY + '/0000000001', data=dumps(dummy1))
+        self.assertEquals(rv.status_code, 405)
+        
+    def test_post_collection(self):
+        d = {ENTITY: [dummy1, dummy2, dummy3]}
+        rv = self.client.post(ROOT, data=dumps(d))
+        self.assertEquals(rv.status_code, 200)
 
-        # alter the doc
-        doc['title'] = 'changed title'
-        doc['text'] = 'changed text'
-
-        # save the modified doc
-        rv = self.app.put(url.path, data=dumps(doc))
-
-        # check there are still three entries
-        rv = self.app.get(HOME)
+        # should return a list of urls
         d = loads(rv.data)
-        l = d[ENTITY]
-        assert(len(l) == 3)
+        self.assertEquals(type(d), type(list()))
 
-    def test_put_collection(self):
-        d = {ENTITY: [self.dummy1, self.dummy2, self.dummy3, self.dummy4]}
+class PutRestTestCase(LazyBaseTestCase):
 
+    def test_put_unsaved_thing_fails(self):
+        rv = self.client.put(ROOT, data=dumps(dummy1))
+        self.assertEquals(rv.status_code, 405)
+
+    def test_put_collection_containing_unsaved_thing_fails(self):
+        def postAndGet(d):
+            path = self.post_data(d)
+            rv = self.client.get(path)
+            return loads(rv.data), path
+        
+        # don't save all objects first
+        d = {ENTITY: [postAndGet(dummy1), dummy2, dummy3]}
+        
         # put docs
-        rv = self.app.put(HOME, data=dumps(d))
-        assert(rv.status_code == 200)
+        rv = self.client.put(ROOT, data=dumps(d))
+        self.assertEquals(rv.status_code, 405)
+        
+    def test_update_resource(self):
+        def postAndGet(d):
+            path = self.post_data(d)
+            rv = self.client.get(path)
+            return loads(rv.data), path
 
-        # count docs
-        rv = self.app.get(HOME)
-        d = loads(rv.data)
-        l = d[ENTITY]
-        assert(len(l) == 4)    
+        doc, path = postAndGet(dummy1)
+        doc['title'] = 'new title'
+        rv = self.client.put(path, data=dumps(doc))
+        self.assertEquals(rv.status_code, 200)
+        
+    def test_update_collection(self):
+        def postAndGet(d):
+            path = self.post_data(d)
+            rv = self.client.get(path)
+            return loads(rv.data)
+        
+        d = {ENTITY: [postAndGet(dummy1), postAndGet(dummy2), postAndGet(dummy3)]}
+        
+        # put docs
+        rv = self.client.put(ROOT, data=dumps(d))
+        self.assertEquals(rv.status_code, 200)        
+        self.assertEquals(self.count_data(), 3)
+
+
+class DeleteRestTestCase(LazyBaseTestCase):
+    
+    def test_delete_resource(self):
+        self.post_data(dummy1)
+        self.post_data(dummy2)
+        self.post_data(dummy3)
+        doc, path = self.get_first_doc()
+
+        rv = self.client.delete(path)
+        self.assertEquals(rv.status_code, 200)
+        self.assertEquals(self.count_data(), 2)
+
+    def test_delete_collection(self):
+        self.post_data(dummy1)
+        self.post_data(dummy2)
+        self.post_data(dummy3)
+        
+        rv = self.client.delete(ROOT)
+        self.assertEquals(rv.status_code, 200)
+        self.assertEquals(self.count_data(),0)
 

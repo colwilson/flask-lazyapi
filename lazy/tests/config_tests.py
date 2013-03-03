@@ -3,9 +3,8 @@
 import lazy
 from flask import Flask, Blueprint
 import unittest
-from urlparse import urlparse
 from pymongo import MongoClient
-from bson.json_util import dumps, loads, ObjectId
+from bson.json_util import dumps
 
 
 class Alphas(lazy.API): pass
@@ -17,13 +16,14 @@ class Gammas(lazy.API):
     pass
     # bp registered as version = "v1.0"
 
-    
-class ConfigTestCase(unittest.TestCase):
 
-    dummy1 = dict(title="title1", text="text1")
-    dummy2 = dict(title="title2", text="text2")
-    dummy3 = dict(title="title3", text="text3")
-    dummy4 = dict(title="title4", text="text4")
+dummy1 = dict(title="title1", text="text1")
+dummy2 = dict(title="title2", text="text2")
+dummy3 = dict(title="title3", text="text3")
+dummy4 = dict(title="title4", text="text4")
+
+
+class ConfigTestCase(unittest.TestCase):
 
 
     def setUp(self):
@@ -40,7 +40,7 @@ class ConfigTestCase(unittest.TestCase):
         self.app = app.test_client()
 
         self.connection = MongoClient()
-        print app.url_map
+        #print app.url_map
 
     def test_auto_db_name(self):
         entity = 'alphas'
@@ -69,14 +69,15 @@ class ConfigTestCase(unittest.TestCase):
         self.collection = self.db[entity]
         self.connection.drop_database(dbname)
 
-        d = {entity: [self.dummy1, self.dummy2, self.dummy3, self.dummy4]}
+        d = {entity: [dummy1, dummy2, dummy3, dummy4]}
 
         # put docs
-        rv = self.app.put(home, data=dumps(d))
-
+        rv = self.app.post(home, data=dumps(d))
+        self.assertEquals(rv.status_code, 200)
+        
         # count docs
         c = self.collection.count()
-        assert(c == 4)
+        self.assertEquals(c, 4)
         self.connection.drop_database(dbname)
 
 
