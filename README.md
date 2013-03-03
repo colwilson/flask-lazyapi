@@ -1,7 +1,8 @@
 lazyapi
 =======
 
-A REST interface for MongoDB that just works
+A REST interface for MongoDB that runs on your flask development server while you write the app.
+Virtually zero config, no schemas and useless in the real world. Much like myself. 
 
 Install the module
 
@@ -96,3 +97,8 @@ If you want to version your interface you can use the normal Blueprint mechanism
 
 
 
+TODO
+* A schema would be a nice optional extra
+* OPTIONS are never handled
+* check for duplicates? return 409? wikipedia just says "The PUT and DELETE methods are idempotent methods."
+* should put and post replace the collection or update it?

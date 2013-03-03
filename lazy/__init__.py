@@ -10,7 +10,8 @@ from pymongo import MongoClient
 #from nose.tools import set_trace; set_trace()
 
 class API(FlaskView):
-    # TODO OPTIOMS are never handled
+    # TODO A schema would be a nice optional extra
+    # TODO OPTIONS are never handled
     # TODO check for duplicates? return 409?
     #   wikipedia just says "The PUT and DELETE methods are idempotent methods."
     # TODO should put and post replace the collection or update it?
