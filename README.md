@@ -101,4 +101,5 @@ TODO
 * A schema would be a nice optional extra
 * OPTIONS are never handled
 * check for duplicates? return 409? wikipedia just says "The PUT and DELETE methods are idempotent methods."
+* block al requests not from localhost?
 * should put and post replace the collection or update it?
