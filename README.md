@@ -56,6 +56,18 @@ Get a listing of what's in there
     }
 
 
+Query what's in there
+--------------------------------
+
+    curl -X GET -H "content-type: application/json" http://127.0.0.1:5000/answers/ --data "{\"day\": \"Tuesday\"}"
+
+    {
+        "answers": [
+            "http://127.0.0.1:5000/answers/51351bc49537bd2ee894db13"
+        ]
+    }
+
+
 Fetch a specific answer entity
 ------------------------------
 
