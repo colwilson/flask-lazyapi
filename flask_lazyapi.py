@@ -10,12 +10,7 @@ from pymongo import MongoClient
 #from nose.tools import set_trace; set_trace()
 
 class API(FlaskView):
-    # TODO A schema would be a nice optional extra
-    # TODO OPTIONS are never handled
-    # TODO check for duplicates? return 409?
-    #   wikipedia just says "The PUT and DELETE methods are idempotent methods."
-    # TODO should put and post replace the collection or update it?
-    
+   
     def _rsrc_url(self, id):
         return request.url_root[:-1] + url_for(request.endpoint) + str(id)
 
@@ -143,8 +138,8 @@ class API(FlaskView):
         except Exception, e:
             return (str(e), 400, None)
             
-    @route('/<id>', methods=['PUT'])
-    def put_id(self, id):
+    @route('/<id>', methods=['PATCH', 'PUT'])
+    def patch_id(self, id):
         payload = request.data        
         try:
             assert(isinstance(payload, basestring))

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import lazy
+import flask_lazyapi as lazy
 from flask import Flask, Blueprint
 import unittest
 from pymongo import MongoClient

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import lazy
+import flask_lazyapi as lazy
 from flask import Flask
 import unittest
 from urlparse import urlparse

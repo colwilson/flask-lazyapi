@@ -61,13 +61,13 @@ class PostRestTestCase(LazyBaseTestCase):
         d = loads(rv.data)
         self.assertEquals(type(d), type(list()))
 
-class PutRestTestCase(LazyBaseTestCase):
+class PatchRestTestCase(LazyBaseTestCase):
 
-    def test_put_unsaved_thing_fails(self):
-        rv = self.client.put(ROOT, data=dumps(dummy1))
+    def test_patch_unsaved_thing_fails(self):
+        rv = self.client.patch(ROOT, data=dumps(dummy1))
         self.assertEquals(rv.status_code, 405)
 
-    def test_put_collection_containing_unsaved_thing_fails(self):
+    def test_patch_collection_containing_unsaved_thing_fails(self):
         def postAndGet(d):
             path = self.post_data(d)
             rv = self.client.get(path)
@@ -76,8 +76,8 @@ class PutRestTestCase(LazyBaseTestCase):
         # don't save all objects first
         d = {ENTITY: [postAndGet(dummy1), dummy2, dummy3]}
         
-        # put docs
-        rv = self.client.put(ROOT, data=dumps(d))
+        # patch docs
+        rv = self.client.patch(ROOT, data=dumps(d))
         self.assertEquals(rv.status_code, 405)
         
     def test_update_resource(self):
@@ -88,7 +88,7 @@ class PutRestTestCase(LazyBaseTestCase):
 
         doc, path = postAndGet(dummy1)
         doc['title'] = 'new title'
-        rv = self.client.put(path, data=dumps(doc))
+        rv = self.client.patch(path, data=dumps(doc))
         self.assertEquals(rv.status_code, 200)
         
     def test_update_collection(self):
@@ -102,6 +102,50 @@ class PutRestTestCase(LazyBaseTestCase):
         # put docs
         rv = self.client.put(ROOT, data=dumps(d))
         self.assertEquals(rv.status_code, 200)        
+        self.assertEquals(self.count_data(), 3)
+
+
+class PutRestTestCase(LazyBaseTestCase):
+
+    def test_put_unsaved_thing_fails(self):
+        rv = self.client.put(ROOT, data=dumps(dummy1))
+        self.assertEquals(rv.status_code, 405)
+
+    def test_put_collection_containing_unsaved_thing_fails(self):
+        def postAndGet(d):
+            path = self.post_data(d)
+            rv = self.client.get(path)
+            return loads(rv.data), path
+
+        # don't save all objects first
+        d = {ENTITY: [postAndGet(dummy1), dummy2, dummy3]}
+
+        # put docs
+        rv = self.client.put(ROOT, data=dumps(d))
+        self.assertEquals(rv.status_code, 405)
+
+    def test_update_resource(self):
+        def postAndGet(d):
+            path = self.post_data(d)
+            rv = self.client.get(path)
+            return loads(rv.data), path
+
+        doc, path = postAndGet(dummy1)
+        doc['title'] = 'new title'
+        rv = self.client.put(path, data=dumps(doc))
+        self.assertEquals(rv.status_code, 200)
+
+    def test_update_collection(self):
+        def postAndGet(d):
+            path = self.post_data(d)
+            rv = self.client.get(path)
+            return loads(rv.data)
+
+        d = {ENTITY: [postAndGet(dummy1), postAndGet(dummy2), postAndGet(dummy3)]}
+
+        # put docs
+        rv = self.client.put(ROOT, data=dumps(d))
+        self.assertEquals(rv.status_code, 200)
         self.assertEquals(self.count_data(), 3)
 
 

@@ -13,7 +13,7 @@ Write a server.py
     #!/usr/bin/env python
 
     from flask import Flask
-    import lazy
+    import flask_lazyapi as lazy
 
     class Answers(lazy.API): pass
 
@@ -81,7 +81,7 @@ If you want to version your interface you can use the normal Blueprint mechanism
     #!/usr/bin/env python
 
     from flask import Flask, Blueprint
-    import lazy
+    import flask_lazyapi as lazy
 
     class Answers(lazy.API): pass
 
@@ -99,7 +99,7 @@ If you want to version your interface you can use the normal Blueprint mechanism
 
 TODO
 * A schema would be a nice optional extra
+* Search criteria? only for GET surely?
 * OPTIONS are never handled
 * check for duplicates? return 409? wikipedia just says "The PUT and DELETE methods are idempotent methods."
-* block al requests not from localhost?
-* should put and post replace the collection or update it?
+* block all requests not from localhost?
