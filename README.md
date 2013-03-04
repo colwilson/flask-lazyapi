@@ -6,7 +6,7 @@ Virtually zero config, no schemas and useless in the real world. Much like mysel
 
 Install the module
 
-    pip install lazyapi
+    pip install flask-lazyapi
 
 Write a server.py
 
