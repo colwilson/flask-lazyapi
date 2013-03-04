@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='flask-lazyapi',
-    version='0.2a',
+    version='0.3',
     url='https://github.com/colwilson/flask-lazyapi',
     license='BSD',
     author='Col Wilson',
