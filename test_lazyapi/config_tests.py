@@ -37,10 +37,9 @@ class ConfigTestCase(unittest.TestCase):
         Gammas.register(bp)
         app.register_blueprint(bp, url_prefix="/v1.0")
         
-        self.app = app.test_client()
-
+        self.client = app.test_client()
         self.connection = MongoClient()
-        #print app.url_map
+        #print app.url_map        
 
     def test_auto_db_name(self):
         entity = 'alphas'
@@ -72,7 +71,7 @@ class ConfigTestCase(unittest.TestCase):
         d = {entity: [dummy1, dummy2, dummy3, dummy4]}
 
         # put docs
-        rv = self.app.post(home, data=dumps(d))
+        rv = self.client.post(home, data=dumps(d))
         self.assertEquals(rv.status_code, 200)
         
         # count docs

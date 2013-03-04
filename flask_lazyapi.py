@@ -32,7 +32,13 @@ class API(FlaskView):
         return collection   
     
     def index(self):
-        docs = self.collection().find()
+        #from nose.tools import set_trace; set_trace()
+        if len(request.data) == 0:
+            payload = '{}' # the default
+        else:
+            payload = request.data
+        query = loads(payload)
+        docs = self.collection().find(query)
         urls = [ self._rsrc_url(doc['_id']) for doc in docs ]
         return (dumps({self.get_route_base(): urls}), 200, None)
             
@@ -145,19 +151,13 @@ class API(FlaskView):
             assert(isinstance(payload, basestring))
             doc = loads(payload)
             assert(type(doc) == type(dict()))
-            try:                
-                assert('_id' in doc)
-                assert('created_at' in doc)
-                assert('updated_at' in doc)
-            except:
-                return ('You are trying to update a record which was not previously stored', 405)
             doc['updated_at'] = datetime.datetime.now()
             
             rid = self.collection().save(doc)
             assert(ObjectId(id) == rid)
             
             if rid:
-                return (dumps(doc), 200, {'Content-Location': request.url})
+                return (request.url, 200, {'Content-Location': request.url})
             else:
                 return ('data was not updated', 500, None)
         except Exception, e:
