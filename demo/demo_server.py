@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from flask import Flask
-import lazy
+import flask_lazyapi as lazy
 
 class Answers(lazy.API): pass
 
