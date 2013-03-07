@@ -3,6 +3,7 @@
 from urlparse import urlparse
 from bson.json_util import dumps, loads
 from base import LazyBaseTestCase, ENTITY
+#from nose.tools import set_trace; set_trace()
 
 ROOT = '/' + ENTITY + '/'
 
@@ -13,6 +14,14 @@ dummy4 = dict(title="title4", text="text4")
 
 class GetRestTestCase(LazyBaseTestCase):
 
+    def test_get_uncreated_collection_returns_empty_entity_list(self):
+        
+        rv = self.client.get(ROOT)
+        
+        d = loads(rv.data)
+        l = d[ENTITY]
+        self.assertEquals(len(l), 0)
+        
     def test_get_collection(self):
         self.post_data(dummy1)
         self.post_data(dummy2)

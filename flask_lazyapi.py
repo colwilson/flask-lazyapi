@@ -7,7 +7,6 @@ from bson.json_util import dumps, loads, ObjectId
 from bson.errors import InvalidId
 from pymongo.errors import OperationFailure
 from pymongo import MongoClient
-#from nose.tools import set_trace; set_trace()
 
 class API(FlaskView):
    
@@ -32,7 +31,7 @@ class API(FlaskView):
         return collection   
     
     def index(self):
-        #from nose.tools import set_trace; set_trace()
+        from nose.tools import set_trace; set_trace()
         if len(request.data) == 0:
             payload = '{}' # the default
         else:
