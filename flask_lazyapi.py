@@ -31,7 +31,6 @@ class API(FlaskView):
         return collection   
     
     def index(self):
-        from nose.tools import set_trace; set_trace()
         if len(request.data) == 0:
             payload = '{}' # the default
         else:
