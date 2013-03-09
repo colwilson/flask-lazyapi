@@ -20,6 +20,7 @@ class API(FlaskView):
             doc['updated_at'] = datetime.datetime.now()
         return doc
 
+    @property
     def collection(self):
         connection = MongoClient()
         try:
@@ -36,13 +37,13 @@ class API(FlaskView):
         else:
             payload = request.data
         query = loads(payload)
-        docs = self.collection().find(query)
+        docs = self.collection.find(query)
         urls = [ self._rsrc_url(doc['_id']) for doc in docs ]
         return (dumps({self.get_route_base(): urls}), 200, None)
             
     def get(self, id):
         try:
-            doc = self.collection().find_one(ObjectId(id))
+            doc = self.collection.find_one(ObjectId(id))
             assert(doc is not None)
             return (dumps(doc), 200, None)
         except InvalidId, e:
@@ -65,14 +66,14 @@ class API(FlaskView):
                     # i.e is it a list of things in a dict? { "things": [] }
                     return ('use the format { "%s": [] }' % self.get_route_base(), 405)
                 docs = [self._ensure_has_datetimes(doc) for doc in d[self.get_route_base()]]
-                ids = self.collection().insert(docs)
+                ids = self.collection.insert(docs)
                 if isinstance(ids, list):
                     return dumps([self._rsrc_url(id) for id in ids])
                 else:
                     return ('data was not inserted', 400, None)
             else:
                 doc = self._ensure_has_datetimes(d)
-                id = self.collection().insert(doc)
+                id = self.collection.insert(doc)
                 if id:
                     return (self._rsrc_url(id), 201, {'Content-Location': self._rsrc_url(id)})
                 else:
@@ -86,7 +87,7 @@ class API(FlaskView):
             
     def delete(self):
         try:
-            self.collection().remove()
+            self.collection.remove()
             return ('deleted', 200, None)
         except InvalidId, e:
             return (str(e), 406, None)
@@ -98,7 +99,7 @@ class API(FlaskView):
     @route('/<id>', methods=['DELETE'])
     def delete_id(self, id):
         try:
-            self.collection().remove(ObjectId(id))
+            self.collection.remove(ObjectId(id))
             return ('deleted ' + id, 200, None)
         except InvalidId, e:
             return (str(e), 406, None)
@@ -131,10 +132,10 @@ class API(FlaskView):
                 doc['updated_at'] = datetime.datetime.now()
 
             #empty the collection
-            self.collection().remove()
+            self.collection.remove()
             
             # add new docs
-            ids = self.collection().insert(docs)
+            ids = self.collection.insert(docs)
             if len(ids):
                 return ('collection replace ok', 200, {'Content-Location': request.url})
             else:
@@ -151,7 +152,7 @@ class API(FlaskView):
             assert(type(doc) == type(dict()))
             doc['updated_at'] = datetime.datetime.now()
             
-            rid = self.collection().save(doc)
+            rid = self.collection.save(doc)
             assert(ObjectId(id) == rid)
             
             if rid:
