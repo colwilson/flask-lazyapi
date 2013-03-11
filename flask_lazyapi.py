@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import datetime
-from flask import request, url_for
+from flask import request, url_for, current_app
 from flask.ext.classy import FlaskView, route
 from bson.json_util import dumps, loads, ObjectId
 from bson.errors import InvalidId
@@ -10,8 +10,9 @@ from pymongo import MongoClient
 
 class API(FlaskView):
    
-    def _rsrc_url(self, id):
-        return request.url_root[:-1] + url_for(request.endpoint) + str(id)
+    def _resource_url(self, id):
+        get_endpoint = request.endpoint.split(':')[0] + ':get'
+        return url_for(get_endpoint, id=id, _external = not current_app.config['TESTING'])
 
     def _ensure_has_datetimes(self, doc):
         if not 'created_at' in doc:
@@ -38,7 +39,7 @@ class API(FlaskView):
             payload = request.data
         query = loads(payload)
         docs = self.collection.find(query)
-        urls = [ self._rsrc_url(doc['_id']) for doc in docs ]
+        urls = [ self._resource_url(doc['_id']) for doc in docs ]
         return (dumps({self.get_route_base(): urls}), 200, None)
             
     def get(self, id):
@@ -68,14 +69,14 @@ class API(FlaskView):
                 docs = [self._ensure_has_datetimes(doc) for doc in d[self.get_route_base()]]
                 ids = self.collection.insert(docs)
                 if isinstance(ids, list):
-                    return dumps([self._rsrc_url(id) for id in ids])
+                    return dumps([self._resource_url(id) for id in ids])
                 else:
                     return ('data was not inserted', 400, None)
             else:
                 doc = self._ensure_has_datetimes(d)
                 id = self.collection.insert(doc)
                 if id:
-                    return (self._rsrc_url(id), 201, {'Content-Location': self._rsrc_url(id)})
+                    return (self._resource_url(id), 201, {'Content-Location': self._resource_url(id)})
                 else:
                     return ('data was not inserted', 400, None)
         except Exception, e:
