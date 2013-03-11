@@ -125,7 +125,8 @@ By default the database name will be entity name + db, e.g.
 
 will use a db called 'answersdb', but you specify that if you want
 
-    class Answers(lazy.API): db = 'mydb'
+    class Answers(lazy.API):
+        db = 'mydb'
 
 will use a db called 'mydb'.
 
@@ -133,28 +134,19 @@ will use a db called 'mydb'.
 API Versioning
 --------------
 
-If you want to version your interface you can use the normal Blueprint mechanism
+If you want to version your interface it's as simple as this
 
-    #!/usr/bin/env python
+    class Answers(lazy.API):
+        version = "v1.1"
 
-    from flask import Flask, Blueprint
-    import flask_lazyapi as lazy
+The version name is then inserted before the collection name in the URIs
 
-    class Answers(lazy.API): pass
-
-    app = Flask(__name__)
-
-    version = "v1.0"
-    bp = Blueprint(version, __name__)
-    Answers.register(app)
-    app.register_blueprint(bp, url_prefix="/%s" % version)
-
-    if __name__ == '__main__':
-        app.run(debug=True)
+    http://127.0.0.1:5000/v1.1/answers/51351b989537bd2ee894db12
 
 
 TODO
 ----
+* GET queries should be parameterized in the URL, not inserted in the request body. Naughty, naughty.
 * A schema would be a nice optional extra
 * OPTIONS are never handled
 * check for duplicates? return 409? wikipedia just says "The PUT and DELETE methods are idempotent methods."
