@@ -21,16 +21,42 @@ class API(FlaskView):
             doc['updated_at'] = datetime.datetime.now()
         return doc
 
+
+    @classmethod
+    def get_collection_name(cls):
+        
+        if hasattr(cls, "route_base"):
+            route_base = cls.route_base
+        else:
+            if cls.__name__.endswith("View"):
+                route_base = cls.__name__[:-4].lower()
+            else:
+                route_base = cls.__name__.lower()
+                
+        return route_base.strip("/")
+
+        
+    @classmethod
+    def get_route_base(cls):
+        collection_name = cls.get_collection_name()
+
+        if hasattr(cls, "version"):
+            return cls.version + "/" + cls.get_collection_name()
+        else:
+            return cls.get_collection_name()
+        
     @property
     def collection(self):
         connection = MongoClient()
+        collection_name = self.get_collection_name()
+        
         try:
             db = connection[self.db]
         except:
-            db = connection[self.get_route_base()+'db']
+            db = connection[collection_name +'db']
             
-        collection = db[self.get_route_base()]
-        return collection   
+        return db[collection_name]
+
     
     def index(self):
         if len(request.data) == 0:
@@ -54,22 +80,22 @@ class API(FlaskView):
 
     def post(self):           
         payload = request.data
+        collection_name = self.get_collection_name()
         try:
             assert(isinstance(payload, basestring))
             d = loads(payload)
-            assert(isinstance(d, dict))         
-            if self.get_route_base() in d:                
+            assert(isinstance(d, dict))
+            if collection_name in d:
                 try:
-                    assert(self.get_route_base() in d)
-                    l = d[self.get_route_base()]
+                    l = d[collection_name]
                     assert(isinstance(l, list))
                 except:
                     # i.e is it a list of things in a dict? { "things": [] }
-                    return ('use the format { "%s": [] }' % self.get_route_base(), 405)
-                docs = [self._ensure_has_datetimes(doc) for doc in d[self.get_route_base()]]
+                    return ('use the format { "%s": [] }' % collection_name, 405)
+                docs = [self._ensure_has_datetimes(doc) for doc in d[collection_name]]
                 ids = self.collection.insert(docs)
                 if isinstance(ids, list):
-                    return dumps([self._resource_url(id) for id in ids])
+                    return dumps([self._resource_url(id) for id in ids]) # a 200 (not a 201 inserted)
                 else:
                     return ('data was not inserted', 400, None)
             else:
@@ -80,6 +106,7 @@ class API(FlaskView):
                 else:
                     return ('data was not inserted', 400, None)
         except Exception, e:
+            print str(e)
             return (str(e), 400, None)
 
     @route('/<id>', methods=['POST'])

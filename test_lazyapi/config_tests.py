@@ -5,6 +5,7 @@ from flask import Flask, Blueprint
 import unittest
 from pymongo import MongoClient
 from bson.json_util import dumps
+#from nose.tools import set_trace; set_trace()
 
 
 class Alphas(lazy.API): pass
@@ -13,8 +14,7 @@ class Betas(lazy.API):
     db = "TestBetasDB"
     
 class Gammas(lazy.API):
-    pass
-    # bp registered as version = "v1.0"
+    version = "v1.0"
 
 
 dummy1 = dict(title="title1", text="text1")
@@ -31,15 +31,12 @@ class ConfigTestCase(unittest.TestCase):
         app.config['TESTING'] = True
         
         Alphas.register(app)
-        Betas.register(app)
-        
-        bp = Blueprint("v1.0", __name__)
-        Gammas.register(bp)
-        app.register_blueprint(bp, url_prefix="/v1.0")
+        Betas.register(app)      
+        Gammas.register(app)
         
         self.client = app.test_client()
         self.connection = MongoClient()
-        #print app.url_map        
+        #print app.url_map
 
     def test_auto_db_name(self):
         entity = 'alphas'

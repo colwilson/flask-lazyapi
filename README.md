@@ -102,6 +102,20 @@ you can use PUT to replace the whole collection and PUT or PATCH to replace/modi
     http://127.0.0.1:5000/answers/51351b989537bd2ee894db12
 
 
+Add your own endpoints
+----------------------
+You can also write your own endpoints. Here's an example that adds an '/answers/random' endpoint for when you just
+don't know the answer.
+
+    import random
+
+    class Answers(lazy.API):
+        docs = self.collection.find()
+        doc = random.choice(docs)
+        url = self._resource_url(doc['_id'])
+        return url
+
+
 Database Names
 --------------
 

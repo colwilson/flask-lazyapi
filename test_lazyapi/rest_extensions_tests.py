@@ -81,7 +81,6 @@ class RestExtensionsTestCase(unittest.TestCase):
         texts = []
         for url in l:
             rv = self.client.get(url)
-            print url, rv.data
             doc = loads(rv.data)
             texts.append(doc['text'])
 

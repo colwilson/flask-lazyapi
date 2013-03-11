@@ -28,7 +28,6 @@ class ConfigTestCase(LazyBaseTestCase):
 
         time.sleep(0.1)
 
-        #from nose.tools import set_trace; set_trace()
         self.client.put(path, data=dumps(doc))
         doc, path = self.get_first_doc()
         self.assertNotEquals(doc['created_at'], doc['updated_at'])

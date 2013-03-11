@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name='flask-lazyapi',
-    version='0.3a',
+    version='0.4',
     url='https://github.com/colwilson/flask-lazyapi',
     license='BSD',
     author='Col Wilson',
