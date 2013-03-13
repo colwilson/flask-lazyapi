@@ -13,17 +13,17 @@ from base import LazyBaseTestCase, ENTITY
 ENTITY = 'things'
 ROOT = '/' + ENTITY + '/'
 
-dummy1 = dict(title="a", text="d")
-dummy2 = dict(title="b", text="c")
-dummy3 = dict(title="c", text="b")
-dummy4 = dict(title="d", text="a")
+dummy1 = dict(title="a", text="d", num=4)
+dummy2 = dict(title="b", text="c", num=300)
+dummy3 = dict(title="c", text="b", num=2)
+dummy4 = dict(title="d", text="a", num=100)
 
 DB = ENTITY + 'db'
 
 class Things(lazy.API):
 
     def sorted(self, sort_by, direction):
-        docs = self.collection.find().sort(sort_by, dict(asc=1,desc=-1)[direction])
+        docs = self.docs.find().sort(sort_by, dict(asc=1,desc=-1)[direction])
         urls = [ self._resource_url(doc['_id']) for doc in docs ]
         return (dumps({self.get_route_base(): urls}), 200, None)
     
@@ -39,8 +39,8 @@ class RestExtensionsTestCase(unittest.TestCase):
         self.client = app.test_client()
         self.connection = MongoClient()
         self.db = self.connection[DB]
-        self.collection = self.db[ENTITY]
-        self.collection.remove()
+        self.docs = self.db[ENTITY]
+        self.docs.remove()
         print app.url_map
         
     def tearDown(self):
@@ -85,6 +85,43 @@ class RestExtensionsTestCase(unittest.TestCase):
             texts.append(doc['text'])
 
         self.assertEquals(texts, ['d', 'c', 'b', 'a'])
+
+
+    def test_sort_asc_numerically(self):
+        self.post_data(dummy1)
+        self.post_data(dummy3)
+        self.post_data(dummy4)
+        self.post_data(dummy2)
+        rv = self.client.get(ROOT + 'sorted/num/asc')
+        d = loads(rv.data)
+        l = d[ENTITY]
+
+        nums = []
+        for url in l:
+            rv = self.client.get(url)
+            doc = loads(rv.data)
+            nums.append(doc['num'])
+
+        self.assertEquals(nums, [2, 4, 100, 300])
+
+
+    def test_sort_desc_numerically(self):
+        self.post_data(dummy1)
+        self.post_data(dummy3)
+        self.post_data(dummy4)
+        self.post_data(dummy2)
+        rv = self.client.get(ROOT + 'sorted/num/desc')
+        d = loads(rv.data)
+        l = d[ENTITY]
+
+        nums = []
+        for url in l:
+            rv = self.client.get(url)
+            doc = loads(rv.data)
+            nums.append(doc['num'])
+
+        self.assertEquals(nums, [300, 100, 4, 2])
+
 
 
 

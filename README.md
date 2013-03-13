@@ -102,20 +102,6 @@ you can use PUT to replace the whole collection and PUT or PATCH to replace/modi
     http://127.0.0.1:5000/answers/51351b989537bd2ee894db12
 
 
-Add your own endpoints
-----------------------
-You can also write your own endpoints. Here's an example that adds an '/answers/random' endpoint for when you just
-don't know the answer.
-
-    import random
-
-    class Answers(lazy.API):
-        docs = self.collection.find()
-        doc = random.choice(docs)
-        url = self._resource_url(doc['_id'])
-        return url
-
-
 Database Names
 --------------
 
@@ -142,6 +128,46 @@ If you want to version your interface it's as simple as this
 The version name is then inserted before the collection name in the URIs
 
     http://127.0.0.1:5000/v1.1/answers/51351b989537bd2ee894db12
+
+
+Add your own endpoints
+----------------------
+You can also write your own endpoints.
+
+Here's an example that adds an '/answers/random' endpoint for when you just
+don't know the answer. It also adds some /answers/sorted/{sort_by}/{asc|desc} magic.
+
+    #!/usr/bin/env python
+
+    from flask import Flask
+    import flask_lazyapi as lazy
+    import random
+
+    class AugmentedRestInterface(lazy.API):
+        db = "my_database"
+        
+        def sorted(self, sort_by, direction):
+            docs = self.docs.find().sort(sort_by, dict(asc=1,desc=-1)[direction])
+            urls = [ self._resource_url(doc['_id']) for doc in docs ]
+            return (dumps({self.get_route_base(): urls}), 200, None)
+
+        def random(self):
+            docs = self.docs.find()
+            doc = random.choice(docs)
+            url = self._resourceS_url(doc['_id'])
+            return url
+            
+    class Answers(AugmentedRestInterface): pass
+
+    class Questions(AugmentedRestInterface): pass
+        
+    app = Flask(__name__)
+
+    Answers.register(app)
+    Questions.register(app)
+
+    if __name__ == '__main__':
+        app.run(debug=True)
 
 
 TODO
