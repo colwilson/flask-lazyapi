@@ -25,14 +25,16 @@ class API(FlaskView):
     @classmethod
     def _get_collection_name(cls):
         
-        if hasattr(cls, "route_base"):
+        if hasattr(cls, "collection"):
+            return cls.collection
+        elif hasattr(cls, "route_base"):
             route_base = cls.route_base
         else:
             if cls.__name__.endswith("View"):
                 route_base = cls.__name__[:-4].lower()
             else:
                 route_base = cls.__name__.lower()
-                
+        
         return route_base.strip("/")
 
         
@@ -44,6 +46,7 @@ class API(FlaskView):
             return cls.version + "/" + cls._get_collection_name()
         else:
             return cls._get_collection_name()
+
         
     @property
     def docs(self):
@@ -55,10 +58,7 @@ class API(FlaskView):
         except:
             db = connection[collection_name + "db"]
 
-        try:
-            return db[self.collection]
-        except:
-            return db[collection_name]
+        return db[collection_name]
 
     
     def index(self):

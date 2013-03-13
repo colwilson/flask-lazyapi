@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+7#!/usr/bin/env python
 
 import flask_lazyapi as lazy
 from flask import Flask, Blueprint
@@ -15,6 +15,9 @@ class Betas(lazy.API):
     
 class Gammas(lazy.API):
     version = "v1.0"
+
+class Deltas(lazy.API):
+    collection = "dees"
 
 
 dummy1 = dict(title="title1", text="text1")
@@ -33,39 +36,47 @@ class ConfigTestCase(unittest.TestCase):
         Alphas.register(app)
         Betas.register(app)      
         Gammas.register(app)
+        Deltas.register(app)
         
         self.client = app.test_client()
         self.connection = MongoClient()
-        #print app.url_map
+        print app.url_map
 
     def test_auto_db_name(self):
-        entity = 'alphas'
-        dbname = entity + 'db'
-        home = '/%s/' % entity
+        collection = 'alphas'
+        dbname = collection + 'db'
+        home = '/%s/' % collection
 
-        self.do_check_collection_naming(entity, dbname, home)
+        self.do_check_collection_naming(collection, dbname, home)
 
     def test_specified_db_name(self):
-        entity = 'betas'
+        collection = 'betas'
         dbname = 'TestBetasDB'
-        home = '/%s/' % entity
+        home = '/%s/' % collection
         
-        self.do_check_collection_naming(entity, dbname, home)
+        self.do_check_collection_naming(collection, dbname, home)
 
     def test_versioned_auto_db_name(self):
-        entity = 'gammas'
-        dbname = entity + 'db'
-        home = '/v1.0/%s/' % entity
+        collection = 'gammas'
+        dbname = collection + 'db'
+        home = '/v1.0/%s/' % collection
         
-        self.do_check_collection_naming(entity, dbname, home)
+        self.do_check_collection_naming(collection, dbname, home)
         
-    def do_check_collection_naming(self, entity, dbname, home):
+    def test_specified_collection_name(self):
+        collection = 'dees'
+        dbname = collection + 'db'
+        home = '/%s/' % collection
+
+        self.do_check_collection_naming(collection, dbname, home)
+
+    def do_check_collection_naming(self, collection, dbname, home):
 
         self.db = self.connection[dbname]
-        self.collection = self.db[entity]
+        self.collection = self.db[collection]
         self.connection.drop_database(dbname)
 
-        d = {entity: [dummy1, dummy2, dummy3, dummy4]}
+        d = {collection: [dummy1, dummy2, dummy3, dummy4]}
 
         # put docs
         rv = self.client.post(home, data=dumps(d))

@@ -41,7 +41,6 @@ class RestExtensionsTestCase(unittest.TestCase):
         self.db = self.connection[DB]
         self.docs = self.db[ENTITY]
         self.docs.remove()
-        print app.url_map
         
     def tearDown(self):
         self.connection.drop_database(DB)

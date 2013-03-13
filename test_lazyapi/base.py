@@ -25,7 +25,6 @@ class LazyBaseTestCase(unittest.TestCase):
         self.db = self.connection[DB]
         self.collection = self.db[ENTITY]
         self.collection.remove()
-        #print app.url_map
         
     def tearDown(self):
         self.connection.drop_database(DB)
