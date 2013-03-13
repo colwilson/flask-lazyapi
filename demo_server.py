@@ -28,6 +28,7 @@ Answers.register(app)
 Questions.register(app)
 
 if __name__ == '__main__':
+    lazy.dump(app.url_map)
     app.run(debug=True)
 
 

@@ -40,7 +40,6 @@ class ConfigTestCase(unittest.TestCase):
         
         self.client = app.test_client()
         self.connection = MongoClient()
-        print app.url_map
 
     def test_auto_db_name(self):
         collection = 'alphas'

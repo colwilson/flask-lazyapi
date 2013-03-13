@@ -194,4 +194,11 @@ class API(FlaskView):
             return (str(e), 500, None)
 
 
+## utils
+
+def dump(o):
+    import werkzeug
+    if type(o) == werkzeug.routing.Map:
+        for r in o.iter_rules():
+            print "%24s %s" % ('|'.join(r.methods), r)
 
