@@ -1,39 +1,37 @@
-import os
+'''
+A REST interface for MongoDB that runs on your flask development server while you write the app.
+Virtually zero config, no schemas and useless in the real world. Much like myself. 
+
+'''
+
+#from distutils.core import setup
 from setuptools import setup
 
-ROOT = os.path.abspath(os.path.dirname(__file__))
+setup   (
+    name = 'flask-lazyapi',
+    version = '0.4.6',
+    license = 'BSD',
+    description = 'A Simple, Restful MongoDB Server built on Flask and Flask-Classy',
+    long_description = __doc__,
+    url = 'https://github.com/colwilson/flask-lazyapi',
 
-with open(os.path.join(ROOT, 'README.md')) as file:
-    long_description = file.read()
+    author = 'Col Wilson',
+    author_email = 'colwilson@bcs.org',
 
-setup(
-    name='flask-lazyapi',
-    version='0.4.4',
-    url='https://github.com/colwilson/flask-lazyapi',
-    license='BSD',
-    author='Col Wilson',
-    author_email='colwilson@bcs.org',
-    description='A Simple, Restful MongoDB Server built on Flask and Flask-Classy',
-    long_description=long_description,
+    platforms = 'any',
     py_modules=['flask_lazyapi'],
-    zip_safe=False,
-    include_package_data=True,
-    platforms='any',
-    install_requires=[
-        'Flask',
-        'Flask-Classy',
-        'pymongo'
-    ],
-    package_data = {
-        '': ['*.md']
-        },
-    test_suite='test_lazyapi',
-    classifiers=[
+
+    install_requires = [
+        'Flask==0.9',
+        'Flask-Classy==0.5.2',
+        'pymongo==2.4.2' ],
+
+    classifiers = [
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python :: 2 :: Only',
-        'Topic :: Database :: Front-Ends'        
-        ]
+        'Programming Language :: Python',
+        'Topic :: Database :: Front-Ends',
+        'Topic :: Software Development :: Libraries :: Python Modules' ]
     
 )
 
