@@ -8,7 +8,7 @@ with open(os.path.join(ROOT, 'README.md')) as file:
 
 setup(
     name='flask-lazyapi',
-    version='0.4.3',
+    version='0.4.4',
     url='https://github.com/colwilson/flask-lazyapi',
     license='BSD',
     author='Col Wilson',
