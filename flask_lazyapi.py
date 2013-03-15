@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import datetime
+import datetime, pytz
 from flask import request, url_for, current_app
 from flask.ext.classy import FlaskView, route
 from bson.json_util import dumps, loads, ObjectId
@@ -16,9 +16,9 @@ class API(FlaskView):
 
     def _ensure_has_datetimes(self, doc):
         if not 'created_at' in doc:
-            doc['created_at'] = datetime.datetime.now()
+            doc['created_at'] = rightnow()
         if not 'updated_at' in doc:
-            doc['updated_at'] = datetime.datetime.now()
+            doc['updated_at'] = rightnow()
         return doc
 
 
@@ -160,7 +160,7 @@ class API(FlaskView):
                     assert('updated_at' in doc)
                 except:
                     return ('You are trying to update a record which was not previously stored', 405)
-                doc['updated_at'] = datetime.datetime.now()
+                doc['updated_at'] = rightnow()
 
             #empty the collection
             self.docs.remove()
@@ -181,7 +181,7 @@ class API(FlaskView):
             assert(isinstance(payload, basestring))
             doc = loads(payload)
             assert(type(doc) == type(dict()))
-            doc['updated_at'] = datetime.datetime.now()
+            doc['updated_at'] = rightnow()
             
             rid = self.docs.save(doc)
             assert(ObjectId(id) == rid)
@@ -202,3 +202,6 @@ def dump(o):
         for r in o.iter_rules():
             print "%24s %s" % ('|'.join(r.methods), r)
 
+
+def rightnow():
+    return datetime.datetime.utcnow().replace(tzinfo=pytz.utc)

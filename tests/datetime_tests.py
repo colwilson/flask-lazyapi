@@ -4,6 +4,9 @@ import flask_lazyapi as lazy
 from bson.json_util import dumps
 from base import LazyBaseTestCase, ENTITY
 import time
+import datetime
+import pytz
+from nose.tools import * 
 
 ROOT = '/' + ENTITY + '/'
 
@@ -27,8 +30,37 @@ class ConfigTestCase(LazyBaseTestCase):
         self.assertEquals(doc['created_at'], doc['updated_at'])
 
         time.sleep(0.1)
-
         self.client.put(path, data=dumps(doc))
         doc, path = self.get_first_doc()
-        self.assertNotEquals(doc['created_at'], doc['updated_at'])
         
+        self.assertNotEquals(doc['created_at'], doc['updated_at'])
+
+    def test_naive_ok_now(self):
+        rv = self.client.post(ROOT, data=dumps(dummy))
+        time.sleep(0.1)
+        doc, path = self.get_first_doc()
+
+        self.assertNotEquals(doc['created_at'], datetime.datetime.now().replace(tzinfo=pytz.utc))
+
+    def test_naive_ok_utcnow(self):
+        rv = self.client.post(ROOT, data=dumps(dummy))
+        time.sleep(0.1)
+        doc, path = self.get_first_doc()
+
+        self.assertNotEquals(doc['created_at'], datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
+
+    @raises(TypeError)
+    def test_aware_fails_now(self):
+        rv = self.client.post(ROOT, data=dumps(dummy))
+        time.sleep(0.1)
+        doc, path = self.get_first_doc()
+        
+        doc['created_at'] == datetime.datetime.now()
+
+    @raises(TypeError)
+    def test_aware_fails_utcnow(self):
+        rv = self.client.post(ROOT, data=dumps(dummy))
+        time.sleep(0.1)
+        doc, path = self.get_first_doc()
+        
+        doc['created_at'] == datetime.datetime.utcnow()
