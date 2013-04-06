@@ -59,7 +59,7 @@ Get a listing of what's in there
 Query what's in there
 ================================
 
-    curl -X GET -H "content-type: application/json" http://127.0.0.1:5000/answers/ ==data "{\"day\": \"Tuesday\"}"
+    curl -X GET -H "content-type: application/json" http://127.0.0.1:5000/answers/ --data-urlencode 'q={"day": "Tuesday"}'
 
     {
         "answers": [
@@ -172,7 +172,6 @@ don't know the answer. It also adds some /answers/sorted/{sort_by}/{asc|desc} ma
 
 TODO
 ====
-* GET queries should be parameterized in the URL, not inserted in the request body. Naughty, naughty.
 * A schema would be a nice optional extra
 * OPTIONS are never handled
 * check for duplicates? return 409? wikipedia just says "The PUT and DELETE methods are idempotent methods."

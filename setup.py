@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup   (
     name = 'flask-lazyapi',
-    version = '0.4.7',
+    version = '0.4.8',
     license = 'BSD',
     description = 'A Simple, Restful MongoDB Server built on Flask and Flask-Classy',
     long_description = __doc__,

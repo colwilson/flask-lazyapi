@@ -57,7 +57,7 @@ class QueryTestCase(unittest.TestCase):
 
     def find_test(self):
         query = dict(text='textx')
-        rv = self.client.get(ROOT, data=dumps(query))
+        rv = self.client.get(ROOT, query_string=dict(q=dumps(query)))
         d = loads(rv.data)
         l = d[ENTITY]
         self.assertEquals(len(l), 4)
@@ -65,22 +65,23 @@ class QueryTestCase(unittest.TestCase):
     def find_by_time_test(self):
         d = datetime.datetime.now() 
         query = dict(created_at={"$lt": d})
-        rv = self.client.get(ROOT, data=dumps(query))
+        rv = self.client.get(ROOT, query_string=dict(q=dumps(query)))
         d = loads(rv.data)
         l = d[ENTITY]
         self.assertEquals(len(l), 8)
 
     def find_and_test(self):
         query = dict(title="title3", text='textx')
-        
-        rv = self.client.get(ROOT, data=dumps(query))
+        print dict(q=dumps(query))
+        assert(False)
+        rv = self.client.get(ROOT, query_string=dict(q=dumps(query)))
         d = loads(rv.data)
         l = d[ENTITY]
         self.assertEquals(len(l), 1)
         
     def find_or_test(self):
         query = {'title': 'title1', '$or': [ {'text': 'texta'}, {'text': 'textx'} ]}
-        rv = self.client.get(ROOT, data=dumps(query))
+        rv = self.client.get(ROOT, query_string=dict(q=dumps(query)))
         d = loads(rv.data)
         l = d[ENTITY]
         self.assertEquals(len(l), 2)

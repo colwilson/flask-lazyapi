@@ -62,12 +62,9 @@ class API(FlaskView):
 
     
     def index(self):
-        if len(request.data) == 0:
-            payload = '{}' # the default
-        else:
-            payload = request.data
-        query = loads(payload)
-        docs = self.docs.find(query)
+        #from nose.tools import set_trace; set_trace()
+        q = loads(request.args.get('q', '{}'))
+        docs = self.docs.find(q)
         urls = [ self._resource_url(doc['_id']) for doc in docs ]
         return (dumps({self.get_route_base(): urls}), 200, None)
             
@@ -176,7 +173,7 @@ class API(FlaskView):
             
     @route('/<id>', methods=['PATCH', 'PUT'])
     def patch_id(self, id):
-        payload = request.data        
+        payload = request.data
         try:
             assert(isinstance(payload, basestring))
             doc = loads(payload)
