@@ -22,7 +22,7 @@ setup   (
     py_modules=['flask_lazyapi'],
 
     install_requires = [
-        'Flask==0.9',
+        'Flask==1.0',
         'Flask-Classy==0.5.2',
         'pymongo==2.4.2',
         'pytz==2013b' ],
