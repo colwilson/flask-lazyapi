@@ -24,7 +24,7 @@ setup   (
     install_requires = [
         'Flask==0.9',
         'Flask-Classy==0.5.2',
-        'pymongo==2.4.2',
+        'pymongo==2.5.2',
         'pytz==2013b' ],
 
     classifiers = [
